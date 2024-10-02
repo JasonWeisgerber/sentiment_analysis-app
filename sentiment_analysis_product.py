@@ -78,94 +78,100 @@ if df is not None:
         # Clean the review text
         df['cleaned_text'] = df[review_column].apply(clean_text)
         st.write("Text cleaning complete!")
-    
+
         # Perform sentiment analysis based on score (if applicable)
         if score_column != "None":
             df['sentiment'] = df[score_column].apply(map_scores_to_sentiment)
             st.write("Sentiment analysis complete!")
-            st.write(df[['cleaned_text', 'sentiment']].head())
+            st.write(df[['cleaned_text', score_column, 'sentiment']].head())  # Display results
 
     # Step 4: Generate visualizations
     if st.button("Generate Visualizations"):
-        st.write("Generating visualizations...")
+        # Check if the 'sentiment' column has been created
+        if 'sentiment' not in df.columns:
+            st.error("Error: You need to run the analysis step before generating visualizations.")
+        else:
+            st.write("Generating visualizations...")
 
-        # Visualization 1: Sentiment Distribution Bar Chart
-        st.subheader("Sentiment Distribution")
-        sentiment_counts = df['sentiment'].value_counts()
-        fig, ax = plt.subplots()
-        ax.bar(sentiment_counts.index, sentiment_counts.values, color=['red', 'orange', 'green'])
-        ax.set_xticks([0, 1, 2])
-        ax.set_xticklabels(['Negative', 'Neutral', 'Positive'])
-        ax.set_title("Sentiment Distribution")
-        ax.set_xlabel("Sentiment")
-        ax.set_ylabel("Count")
-        st.pyplot(fig)
+            # Visualization 1: Sentiment Distribution Bar Chart
+            st.subheader("Sentiment Distribution")
+            sentiment_counts = df['sentiment'].value_counts()
+            fig, ax = plt.subplots()
+            ax.bar(sentiment_counts.index, sentiment_counts.values, color=['red', 'orange', 'green'])
+            ax.set_xticks([0, 1, 2])
+            ax.set_xticklabels(['Negative', 'Neutral', 'Positive'])
+            ax.set_title("Sentiment Distribution")
+            ax.set_xlabel("Sentiment")
+            ax.set_ylabel("Count")
+            st.pyplot(fig)
 
-        # Visualization 2: Word Clouds for Each Sentiment Category
-        st.subheader("Word Clouds for Each Sentiment Category")
-        create_word_cloud(df, 0, 'Negative')
-        create_word_cloud(df, 1, 'Neutral')
-        create_word_cloud(df, 2, 'Positive')
+            # Visualization 2: Word Clouds for Each Sentiment Category
+            st.subheader("Word Clouds for Each Sentiment Category")
+            create_word_cloud(df, 0, 'Negative')
+            create_word_cloud(df, 1, 'Neutral')
+            create_word_cloud(df, 2, 'Positive')
 
-        # Visualization 3: Review Length Distribution
-        st.subheader("Review Length Distribution")
-        df['review_length'] = df['cleaned_text'].apply(lambda x: len(x.split()))
-        fig, ax = plt.subplots()
-        ax.hist(df['review_length'], bins=30, color='skyblue')
-        ax.set_title("Review Length Distribution")
-        ax.set_xlabel("Review Length (words)")
-        ax.set_ylabel("Frequency")
-        st.pyplot(fig)
+            # Visualization 3: Review Length Distribution
+            st.subheader("Review Length Distribution")
+            df['review_length'] = df['cleaned_text'].apply(lambda x: len(x.split()))
+            fig, ax = plt.subplots()
+            ax.hist(df['review_length'], bins=30, color='skyblue')
+            ax.set_title("Review Length Distribution")
+            ax.set_xlabel("Review Length (words)")
+            ax.set_ylabel("Frequency")
+            st.pyplot(fig)
 
-        st.write("Visualizations generated successfully!")
+            st.write("Visualizations generated successfully!")
 
     # Step 5: Generate a report
     if st.button("Generate Report"):
-        st.write("Generating report...")
+        if 'sentiment' not in df.columns:
+            st.error("Error: Run the analysis step before generating the report.")
+        else:
+            st.write("Generating report...")
 
-        # Prepare statistical data for the report
-        report_buffer = io.BytesIO()  # Create a buffer to hold the PDF
-        c = canvas.Canvas(report_buffer)
+            # Prepare statistical data for the report
+            report_buffer = io.BytesIO()  # Create a buffer to hold the PDF
+            c = canvas.Canvas(report_buffer)
 
-        # Title and Basic Info
-        c.setFont("Helvetica-Bold", 18)
-        c.drawString(100, 800, "Sentiment Analysis Report")
+            # Title and Basic Info
+            c.setFont("Helvetica-Bold", 18)
+            c.drawString(100, 800, "Sentiment Analysis Report")
 
-        # Summary Statistics
-        total_reviews = len(df)
-        positive_reviews = len(df[df['sentiment'] == 2])
-        neutral_reviews = len(df[df['sentiment'] == 1])
-        negative_reviews = len(df[df['sentiment'] == 0])
+            # Summary Statistics
+            total_reviews = len(df)
+            positive_reviews = len(df[df['sentiment'] == 2])
+            neutral_reviews = len(df[df['sentiment'] == 1])
+            negative_reviews = len(df[df['sentiment'] == 0])
 
-        c.setFont("Helvetica", 12)
-        c.drawString(100, 760, f"Total Reviews: {total_reviews}")
-        c.drawString(100, 740, f"Positive Reviews: {positive_reviews} ({positive_reviews/total_reviews:.2%})")
-        c.drawString(100, 720, f"Neutral Reviews: {neutral_reviews} ({neutral_reviews/total_reviews:.2%})")
-        c.drawString(100, 700, f"Negative Reviews: {negative_reviews} ({negative_reviews/total_reviews:.2%})")
+            c.setFont("Helvetica", 12)
+            c.drawString(100, 760, f"Total Reviews: {total_reviews}")
+            c.drawString(100, 740, f"Positive Reviews: {positive_reviews} ({positive_reviews/total_reviews:.2%})")
+            c.drawString(100, 720, f"Neutral Reviews: {neutral_reviews} ({neutral_reviews/total_reviews:.2%})")
+            c.drawString(100, 700, f"Negative Reviews: {negative_reviews} ({negative_reviews/total_reviews:.2%})")
 
-        # Word Frequency Analysis (Top Words for Positive, Neutral, and Negative)
-        c.drawString(100, 660, "Top Words in Positive Reviews:")
-        positive_top_words = " ".join(df[df['sentiment'] == 2]['cleaned_text']).split()
-        c.drawString(100, 640, f"Top Positive Words: {', '.join(pd.Series(positive_top_words).value_counts().index[:10])}")
+            # Word Frequency Analysis (Top Words for Positive, Neutral, and Negative)
+            c.drawString(100, 660, "Top Words in Positive Reviews:")
+            positive_top_words = " ".join(df[df['sentiment'] == 2]['cleaned_text']).split()
+            c.drawString(100, 640, f"Top Positive Words: {', '.join(pd.Series(positive_top_words).value_counts().index[:10])}")
 
-        c.drawString(100, 600, "Top Words in Neutral Reviews:")
-        neutral_top_words = " ".join(df[df['sentiment'] == 1]['cleaned_text']).split()
-        c.drawString(100, 580, f"Top Neutral Words: {', '.join(pd.Series(neutral_top_words).value_counts().index[:10])}")
+            c.drawString(100, 600, "Top Words in Neutral Reviews:")
+            neutral_top_words = " ".join(df[df['sentiment'] == 1]['cleaned_text']).split()
+            c.drawString(100, 580, f"Top Neutral Words: {', '.join(pd.Series(neutral_top_words).value_counts().index[:10])}")
 
-        c.drawString(100, 540, "Top Words in Negative Reviews:")
-        negative_top_words = " ".join(df[df['sentiment'] == 0]['cleaned_text']).split()
-        c.drawString(100, 520, f"Top Negative Words: {', '.join(pd.Series(negative_top_words).value_counts().index[:10])}")
+            c.drawString(100, 540, "Top Words in Negative Reviews:")
+            negative_top_words = " ".join(df[df['sentiment'] == 0]['cleaned_text']).split()
+            c.drawString(100, 520, f"Top Negative Words: {', '.join(pd.Series(negative_top_words).value_counts().index[:10])}")
 
-        # Save the report to the buffer
-        c.save()
+            # Save the report to the buffer
+            c.save()
 
-        # Generate download link for PDF
-        st.download_button(
-            label="Download Report as PDF",
-            data=report_buffer.getvalue(),
-            file_name="sentiment_analysis_report.pdf",
-            mime="application/pdf"
-        )
+            # Generate download link for PDF
+            st.download_button(
+                label="Download Report as PDF",
+                data=report_buffer.getvalue(),
+                file_name="sentiment_analysis_report.pdf",
+                mime="application/pdf"
+            )
 
-        st.write("Report is ready for download!")
-
+            st.write("Report is ready for download!")
