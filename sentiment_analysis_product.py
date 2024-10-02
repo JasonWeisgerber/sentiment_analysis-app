@@ -83,14 +83,17 @@ if df is not None:
         if score_column != "None":
             df['sentiment'] = df[score_column].apply(map_scores_to_sentiment)
             st.write("Sentiment analysis complete!")
-            st.write(df[['cleaned_text', score_column, 'sentiment']].head())  # Display results
+            st.write(df[['cleaned_text', score_column, 'sentiment']].head())
 
-    # Step 4: Generate visualizations
-    if st.button("Generate Visualizations"):
-        # Check if the 'sentiment' column has been created
-        if 'sentiment' not in df.columns:
-            st.error("Error: You need to run the analysis step before generating visualizations.")
-        else:
+        # Store the updated DataFrame in session state
+        st.session_state['df'] = df
+
+    # Check if 'df' exists in session state before visualizations
+    if 'df' in st.session_state:
+        df = st.session_state['df']
+
+        # Step 4: Generate visualizations
+        if st.button("Generate Visualizations"):
             st.write("Generating visualizations...")
 
             # Visualization 1: Sentiment Distribution Bar Chart
@@ -123,11 +126,8 @@ if df is not None:
 
             st.write("Visualizations generated successfully!")
 
-    # Step 5: Generate a report
-    if st.button("Generate Report"):
-        if 'sentiment' not in df.columns:
-            st.error("Error: Run the analysis step before generating the report.")
-        else:
+        # Step 5: Generate a report
+        if st.button("Generate Report"):
             st.write("Generating report...")
 
             # Prepare statistical data for the report
@@ -175,3 +175,4 @@ if df is not None:
             )
 
             st.write("Report is ready for download!")
+
