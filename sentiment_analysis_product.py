@@ -71,7 +71,7 @@ if df is not None:
     # Step 2: Select the columns for reviews and scores
     st.header("2. Select Columns")
     review_column = st.selectbox("Select review column", df.columns)
-    score_column = st.selectbox("Select score column (optional)", ["None"] + list(df.columns))
+    score_column = st.selectbox("Select score column", ["None"] + list(df.columns))
 
     # Step 3: Run sentiment analysis when the user clicks the button
     if st.button("Run Analysis"):
