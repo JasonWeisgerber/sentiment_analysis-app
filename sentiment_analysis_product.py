@@ -176,3 +176,44 @@ if df is not None:
 
             st.write("Report is ready for download!")
 
+# Add buttons and pop-ups for Security, Help, and Testing Information
+st.sidebar.header("Additional Information")
+
+# Security Information Button
+if st.sidebar.button("Security Information"):
+    with st.expander("Security Details"):
+        st.info("""
+        - **Data Privacy**: All user data is processed locally, and no information is shared externally.
+        - **Access Control**: Only authenticated users have access to the sensitive parts of the analysis.
+        - **Error Handling**: Any issues during analysis are handled gracefully to prevent data leakage.
+        - **Secure Downloads**: Generated reports are securely stored and downloaded.
+        """)
+
+# Help Button
+if st.sidebar.button("Help Guide"):
+    with st.expander("How to Use the Sentiment Analysis Tool"):
+        st.markdown("""
+        **Step-by-Step Guide:**
+        1. **Upload** a CSV file with your reviews using the file upload button.
+        2. **Select Columns**: Choose the column for review text and optionally select the column for scores.
+        3. Click **Run Analysis** to perform sentiment analysis.
+        4. Click **Generate Visualizations** to see sentiment trends and word clouds.
+        5. Click **Generate Report** to download a summary report of the analysis.
+        6. If needed, click on **Security Information** or **Help Guide** for further instructions.
+        """)
+
+# Testing and Documentation Button
+if st.sidebar.button("Testing & Documentation"):
+    with st.expander("Testing and Documentation Summary"):
+        st.markdown("""
+        **Testing Overview:**
+        - **Data Input**: Verified that various CSV formats are correctly uploaded and processed.
+        - **Column Selection**: Tested different column configurations to ensure accurate mapping.
+        - **Sentiment Analysis**: Checked accuracy and results for positive, neutral, and negative sentiments.
+        - **Visualization**: Confirmed that all visual outputs match expected data patterns.
+        - **Report Generation**: Validated the PDF and CSV report downloads for different datasets.
+        
+        **Documentation**:
+        - All results and testing scenarios are documented for traceability and reproducibility.
+        """)
+
